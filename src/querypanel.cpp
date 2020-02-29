@@ -10,7 +10,7 @@
 #include "tableview.h"
 #include "sqlhighlighter.h"
 #include "sqlmodel.h"
-
+#include <QDebug>
 #include <QSplitter>
 #include <QTableView>
 #include <QVBoxLayout>
@@ -65,6 +65,18 @@ QueryPanel::QueryPanel(QWidget* parent) :
 
 
         QBoxLayout* toolbar = new QHBoxLayout();
+
+        QPushButton* save = new QPushButton("Save cell modify", this);
+        toolbar->addWidget(save);
+        QPushButton* cancel = new QPushButton("Cancel cell modify", this);
+        toolbar->addWidget(cancel);
+        QPushButton* copy = new QPushButton("Copy current row", this);
+        toolbar->addWidget(copy);
+        QPushButton* add = new QPushButton("Add new row", this);
+        toolbar->addWidget(add);
+        QPushButton* del = new QPushButton("Delete current row", this);
+        toolbar->addWidget(del);
+
         toolbar->addStretch();
 
         QPushButton* run = new QPushButton("Execute statement under cursor (" + ctrlEnter.toString(QKeySequence::NativeText) + ")", this);
@@ -120,38 +132,30 @@ union State {
     int opaque;
 };
 QString QueryPanel::getActiveStatement(int block, int col) {
-
     int from = 0, to = -1;
-    State st;
+    QString sql;
 
     QTextBlock b = editor->document()->findBlockByNumber(block);
-    int scol = col;
-    while(b.isValid()) {
-        st.opaque = b.userState();
-        if(st.s.col != -1 && st.s.col < scol) {
-            from = b.position() + st.s.col + 1;
+    if(b.isValid()) {
+        to = b.position() + b.length();
+    }
+    else {
+        return sql;
+    }
+
+    b = b.previous();
+    while (b.isValid()) {
+        if (b.text().endsWith(";")){
+            from = b.position() + b.length();
             break;
         }
-        scol = INT_MAX;
+        else {
+           from = b.position();
+        }
         b = b.previous();
     }
-
-    b = editor->document()->findBlockByNumber(block);
-    scol = col;
-    while(b.isValid()) {
-        st.opaque = b.userState();
-        if(st.s.col != -1 && st.s.col >= scol) {
-            to = b.position() + st.s.col;
-            break;
-        }
-        scol = 0;
-        b = b.next();
-    }
-
     QString all = editor->document()->toPlainText();
-    if(to < 0)
-        to = all.length();
-    return all.mid(from,to);;
+    return all.mid(from, to).trimmed();
 }
 
 void QueryPanel::executeQuery() {
@@ -159,6 +163,7 @@ void QueryPanel::executeQuery() {
     QString stmt = getActiveStatement(c.blockNumber(), c.columnNumber());
     error->hide();
     status->hide();
+    if (stmt.isEmpty()){qDebug() << "empty query"; return;}
     model->setQuery(stmt);
     model->select();
 }
@@ -166,6 +171,8 @@ void QueryPanel::executeQuery() {
 void QueryPanel::executeAll() {
     error->hide();
     status->hide();
-    model->setQuery(editor->toPlainText());
+    QString stmt = editor->toPlainText();
+    if (stmt.isEmpty()){qDebug() << "empty query"; return;}
+    model->setQuery(stmt);
     model->select();
 }
