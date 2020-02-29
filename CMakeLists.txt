@@ -38,6 +38,9 @@ set(SOURCES
     src/viewtoolbar.cpp
 )
 
+file(GLOB_RECURSE HEADERS "src/*.h")
+
+
 # Qt
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Sql REQUIRED)
@@ -80,7 +83,7 @@ endif()
 
 
 # Define executable
-add_executable(${exe} MACOSX_BUNDLE WIN32 ${SOURCES} ${SRC_RESOURCES})
+add_executable(${exe} MACOSX_BUNDLE WIN32 ${SOURCES} ${HEADERS} ${SRC_RESOURCES})
 target_link_libraries(${exe} ${LIBSSH2_LIBRARY} ${EXTRA_LIBS})
 qt5_use_modules(${exe} Widgets Sql)
 
