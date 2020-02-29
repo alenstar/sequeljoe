@@ -5,36 +5,37 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror -pedantic")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 add_definitions("-std=c++11")
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(SOURCES
-    connectionwidget.cpp
-    constraintitemdelegate.cpp
-    constraintsview.cpp
-    dbconnection.cpp
-    dbfilewidget.cpp
-    driver.cpp
-    favourites.cpp
-    filteredpagedtableview.cpp
-    constrainteditor.cpp
-    loadingoverlay.cpp
-    main.cpp
-    mainpanel.cpp
-    mainwindow.cpp
-    passkeywidget.cpp
-    querylog.cpp
-    querypanel.cpp
-    schemacolumnview.cpp
-    schemamodel.cpp
-    schemaview.cpp
-    sqlhighlighter.cpp
-    sqlmodel.cpp
-    sshthread.cpp
-    tablecell.cpp
-    tablelist.cpp
-    tablemodel.cpp
-    tableview.cpp
-    tabwidget.cpp
-    textcelleditor.cpp
-    viewtoolbar.cpp
+    src/connectionwidget.cpp
+    src/constraintitemdelegate.cpp
+    src/constraintsview.cpp
+    src/dbconnection.cpp
+    src/dbfilewidget.cpp
+    src/driver.cpp
+    src/favourites.cpp
+    src/filteredpagedtableview.cpp
+    src/constrainteditor.cpp
+    src/loadingoverlay.cpp
+    src/main.cpp
+    src/mainpanel.cpp
+    src/mainwindow.cpp
+    src/passkeywidget.cpp
+    src/querylog.cpp
+    src/querypanel.cpp
+    src/schemacolumnview.cpp
+    src/schemamodel.cpp
+    src/schemaview.cpp
+    src/sqlhighlighter.cpp
+    src/sqlmodel.cpp
+    src/sshthread.cpp
+    src/tablecell.cpp
+    src/tablelist.cpp
+    src/tablemodel.cpp
+    src/tableview.cpp
+    src/tabwidget.cpp
+    src/textcelleditor.cpp
+    src/viewtoolbar.cpp
 )
 
 # Qt
@@ -51,13 +52,13 @@ find_library(LIBSSH2_LIBRARY NAMES ssh2 libssh2)
 # Platform-specific
 if(APPLE)
     set(exe "SequelJoe")
-    configure_file(../osxbundle.sh.in osxbundle.sh @ONLY)
-    set(MACOSX_BUNDLE_ICON_FILE joe.icns)
-    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/joe.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-    set(SOURCES ${SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/joe.icns)
+    configure_file(scripts/osxbundle.sh.in osxbundle.sh @ONLY)
+    set(MACOSX_BUNDLE_ICON_FILE src/joe.icns)
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/joe.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(SOURCES ${SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/joe.icns)
     find_library(FOUNDATION_LIBRARY Foundation)
-    set(SOURCES ${SOURCES} notify_osx.mm)
-    set_source_files_properties(notify_osx.mm PROPERTIES COMPILE_FLAGS "-ObjC++")
+    set(SOURCES ${SOURCES} src/notify_osx.mm)
+    set_source_files_properties(src/notify_osx.mm PROPERTIES COMPILE_FLAGS "-ObjC++")
     set(EXTRA_LIBS ${EXTRA_LIBS} ${FOUNDATION_LIBRARY})
 
 elseif(UNIX)
@@ -66,14 +67,14 @@ elseif(UNIX)
     pkg_check_modules(GLIB2 REQUIRED glib-2.0)
     pkg_check_modules(LIBNOTIFY REQUIRED libnotify)
     include_directories(${GLIB2_INCLUDE_DIRS} ${LIBNOTIFY_INCLUDE_DIRS})
-    set(SOURCES ${SOURCES} notify_libnotify.cpp)
+    set(SOURCES ${SOURCES} src/notify_libnotify.cpp)
     set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBNOTIFY_LIBRARIES})
     install(FILES res/sequeljoe.desktop DESTINATION share/applications)
     install(FILES res/sequeljoe.svg DESTINATION share/icons/hicolor/scalable/apps)
 
 elseif(WIN32)
     set(exe "SequelJoe")
-    set(SOURCES ${SOURCES} notify_win32.cpp)
+    set(SOURCES ${SOURCES} src/notify_win32.cpp)
     set(EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
 endif()
 
